@@ -38,10 +38,19 @@ export class TrashExplorerView extends ItemView {
 			}
 		});
 
+		this.component.$on("deleteAll", async (event) => {
+			await this.trash.empty();
+			this.refresh();
+		});
+
 		this.component.$on("delete", async (event) => {
-			if (await this.deleteFile(event.detail)) {
-				this.refresh();
-			}
+			// if (await this.deleteFile(event.detail)) {
+			// 	this.refresh();
+			// }
+			const item = event.detail;
+
+			await item.remove();
+			this.refresh();
 		});
 
 		await this.refresh();

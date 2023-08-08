@@ -1,4 +1,10 @@
-import { Vault, normalizePath, type ListedFiles, type Stat } from "obsidian";
+import {
+	Vault,
+	normalizePath,
+	type ListedFiles,
+	type Stat,
+	Notice,
+} from "obsidian";
 import { basename, dirname } from "./path";
 
 export const TRASH_ROOT = normalizePath(".trash");
@@ -30,6 +36,14 @@ export class Trash {
 		} else {
 			this.root.children = [];
 		}
+	}
+
+	async permEmpty(): Promise<void> {
+		if (await this.vault.adapter.exists(this.root.path)) {
+			await this.root.permRemove();
+		}
+
+		this.root.children = [];
 	}
 
 	async empty(): Promise<void> {
@@ -133,8 +147,15 @@ class TrashedFile extends TrashedBase {
 	}
 
 	async remove(): Promise<void> {
-		await this.vault.adapter.remove(this.path);
-		this.parent?.removeChild(this);
+		// await this.vault.adapter.remove(this.path); //permanently delete
+		try {
+			await this.vault.adapter.trashSystem(this.path); // move to system trash
+			this.parent?.removeChild(this);
+		} catch {
+			new Notice(
+				`Unable to move ${this.basename} to system trash. Please check your permissions.`
+			);
+		}
 	}
 }
 
@@ -157,9 +178,20 @@ class TrashedFolder extends TrashedBase {
 		return restored;
 	}
 
-	async remove(): Promise<void> {
+	async permRemove(): Promise<void> {
 		await this.vault.adapter.rmdir(this.path, true);
 		this.parent?.removeChild(this);
+	}
+
+	async remove(): Promise<void> {
+		try {
+			await this.vault.adapter.trashSystem(this.path); // move to system trash
+			this.parent?.removeChild(this);
+		} catch {
+			new Notice(
+				`Unable to move ${this.basename} to system trash. Please check your permissions.`
+			);
+		}
 	}
 
 	removeChild(child: TrashItem): void {
