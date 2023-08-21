@@ -1,6 +1,6 @@
 {
 	"id": "obsidian-trash-explorer-fork",
-	"name": "Trash Explorer",
+	"name": "Trash Explorer (fork)",
 	"version": "1.2.2",
 	"minAppVersion": "0.15.0",
 	"description": "Restore and delete files from the Obsidian .trash folder",
