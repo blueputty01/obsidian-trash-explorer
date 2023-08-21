@@ -98,6 +98,7 @@ abstract class TrashedBase {
 	readonly path: string;
 	readonly basename: string;
 	readonly size: number;
+	readonly mtime: number;
 
 	constructor(
 		readonly vault: Vault,
@@ -108,6 +109,7 @@ abstract class TrashedBase {
 		this.path = normalizePath(path);
 		this.basename = basename(this.path);
 		this.size = stat?.size || 0;
+		this.mtime = stat?.mtime || 0;
 	}
 
 	protected async restore(): Promise<boolean> {

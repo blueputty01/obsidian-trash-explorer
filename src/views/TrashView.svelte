@@ -10,7 +10,7 @@
 	let searchQuery = "";
 
 	$: viewNodes = buildViewNodes(
-		trash.items,
+		trash.items.sort((a, b) => b.mtime - a.mtime),
 		searchQuery.trim().toLocaleUpperCase()
 	);
 
